@@ -2,9 +2,9 @@ const osmosis = require('osmosis')
 const _ = require('lodash')
 const UrlUtils = require('../util/url-util');
 
-const Scraper = {};
+const NEScraper = {};
 
-Scraper.scrape = (item, limit) => {
+NEScraper.scrape = (item, limit) => {
 
     return new Promise((resolve, reject) => {
         const url = 'https://www.newegg.ca/p/pl?d=' + UrlUtils.replaceSpaces(item);
@@ -12,20 +12,27 @@ Scraper.scrape = (item, limit) => {
         let results = [];
         osmosis
             .get(url)
-            .find(".items-view .item-container .price-current")
-            .set({ dollars: "strong", cents: "sup" })
-            .find('.items-view .item-container .item-info')
+            .find(':not(.search-suggestions)>.items-view .item-container .item-info')
             .set({
-                itemName: 'a.item-title',
-                itemLink: 'a.item-title @href'
+                dollars: ".price-current > strong",
+                cents: ".price-current > sup",
+                name: 'a.item-title',
+                link: 'a.item-title @href',
+                web_id: '.item-compare-box > .form-checkbox > input @neg-itemnumber'
             })
-            .data(i => {
-                if (resultLimit-- <= 0)
-                    resolve(results);
-                results.push(i)
-                results = _.uniqBy(results, result => result.itemName.substring(0, 50))
-            })
+            .log(console.log)
+            .data(result => results.push(result))
             .done(() => {
+                results = _.chain(results)
+                    .map(res => {
+                        return {
+                            price: parseFloat(res.dollars + res.cents),
+                            name: res.name,
+                            link: res.link,
+                            web_id: res.web_id
+                        }
+                    })
+                    .value()
                 resolve(results)
             })
     })
@@ -33,4 +40,4 @@ Scraper.scrape = (item, limit) => {
 }
 
 
-module.exports = Scraper;
+module.exports = NEScraper;
