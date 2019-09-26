@@ -2,7 +2,7 @@ const spaces = [' ', ' ']
 
 const UrlUtils = {
     replaceSpaces: uri => {
-        spaces.forEach(space => uri.replace(space, "%20"))
+        spaces.forEach(space => uri.replace(space, "+"))
         return uri;
     }
 }
