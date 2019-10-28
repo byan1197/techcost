@@ -7,7 +7,8 @@ const NEScraper = {};
 NEScraper.scrape = (item, limit) => {
 
     return new Promise((resolve, reject) => {
-        const url = 'https://www.newegg.ca/p/pl?d=' + UrlUtils.replaceSpaces(item);
+        const url = 'https://www.newegg.ca/p/pl?d=' + UrlUtils.replaceSpaces(item) + '&N=8000';
+        console.log(url)
         let resultLimit = limit || 10;
         let results = [];
         osmosis
@@ -25,8 +26,12 @@ NEScraper.scrape = (item, limit) => {
             .done(() => {
                 results = _.chain(results)
                     .map(res => {
+
+                        let dollars = res.dollars || '0'
+                        dollars = dollars.replace(',', '')
+
                         return {
-                            price: parseFloat(res.dollars + res.cents),
+                            price: parseFloat(dollars + res.cents),
                             name: res.name,
                             link: res.link,
                             web_id: res.web_id

@@ -2,27 +2,26 @@ const osmosis = require('osmosis')
 const _ = require('lodash')
 const UrlUtils = require('../util/url-util');
 
-const CCScraper = {};
+const BBScraper = {};
 
-CCScraper.scrape = (item, limit) => {
+BBScraper.scrape = (item, limit) => {
 
     return new Promise((resolve, reject) => {
-        const url = 'https://www.canadacomputers.com/search/results_details.php?language=en&keywords=' + UrlUtils.replaceSpaces(item);
+
+        let url = 'https://www.bestbuy.ca/en-ca/search?search=' + UrlUtils.replaceSpaces(item)
         let resultLimit = limit || 10;
         let results = [];
+
         osmosis
             .get(url)
-            .find('#results > #product-list > .toggleBox > .productTemplate ')
+            .find('div[class*="productLine_"]')
             .set({
-                price: '.productInfoSearch > span > strong',
-                name: '.productTemplate_title a',
-                link: '.productTemplate_title a@href',
-                // web_id: '.item-compare-box > .form-checkbox > input @neg-itemnumber'
+                price: 'div[class*="price_"] div[class*="medium_"]',
+                name: 'div[class*="productItemName_"]',
+                link: 'a[class*="link_"] @href',
             })
-            .log(console.log)
             .data(result => results.push(result))
             .done(() => {
-                console.log('results', results)
                 results = _.chain(results).filter(obj => Object.keys(obj).length > 0).uniqBy(result => result.name).map(result => {
                     return {
                         ...result,
@@ -31,9 +30,7 @@ CCScraper.scrape = (item, limit) => {
                 }).value()
                 resolve(results)
             })
-    })
-
+    });
 }
 
-
-module.exports = CCScraper;
+module.exports = BBScraper;
