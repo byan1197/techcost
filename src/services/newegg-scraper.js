@@ -4,7 +4,7 @@ const UrlUtils = require('../util/url-util');
 
 const NEScraper = {};
 
-NEScraper.scrape = (item, limit) => {
+NEScraper.scrape = async (item, limit) => {
 
     return new Promise((resolve, reject) => {
         const url = 'https://www.newegg.ca/p/pl?d=' + UrlUtils.replaceSpaces(item) + '&N=8000';
@@ -37,7 +37,9 @@ NEScraper.scrape = (item, limit) => {
                             web_id: res.web_id
                         }
                     })
+                    .filter(res => Object.keys(res).length > 0)
                     .value()
+                    .splice(0, limit)
                 resolve(results)
             })
     })

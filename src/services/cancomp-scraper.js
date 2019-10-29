@@ -23,12 +23,17 @@ CCScraper.scrape = (item, limit) => {
             .data(result => results.push(result))
             .done(() => {
                 console.log('results', results)
-                results = _.chain(results).filter(obj => Object.keys(obj).length > 0).uniqBy(result => result.name).map(result => {
-                    return {
-                        ...result,
-                        price: Number(result.price.replace(/[^0-9.-]+/g, ""))
-                    }
-                }).value()
+                results = _.chain(results).filter(obj => Object.keys(obj).length > 0).uniqBy(result => result.name)
+                    .map(result => {
+                        return {
+                            ...result,
+                            price: Number(result.price.replace(/[^0-9.-]+/g, ""))
+                        }
+                    })
+                    .filter(res => Object.keys(res).length > 0)
+                    .value()
+                    .splice(0, limit)
+                    
                 resolve(results)
             })
     })
