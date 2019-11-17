@@ -1,20 +1,7 @@
 const scrapeFunctions = require('./src/util/scrape-functions')
-const db = require('./src/services/db-functions')
+const dbFunctions = require('./src/services/db-functions')
 const Response = require('./src/util/response')
-
-module.exports.hello = async event => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        message: 'Go Serverless v1.0! Your function executed successfully!',
-        input: event,
-      },
-      null,
-      2
-    ),
-  };
-}
+const CronRequest = require('./src/models/CronRequest')
 
 module.exports.scrapeAndSave = async event => {
   if (!event.body.item_name)
@@ -26,13 +13,13 @@ module.exports.scrapeAndSave = async event => {
   if (!event.body.scrape_type)
     return Response.createErrorResponse(404, 'Site to scrape not specified')
 
-  let scrapeResult = await scrapeFunctions(eavent.body.scrape_type, event.body.item_name)
+  let scrapeResultArr = await scrapeFunctions(eavent.body.scrape_type, event.body.item_name)
   let saveResult = null
 
-  if (!scrapeResult)
+  if (!scrapeResultArr)
     return Response.createErrorResponse(500, "Could not gather data")
   else {
-    saveResult = db.saveScrapedData(result, user_id)
+    saveResult = dbFunctions.saveScrapedData(scrapeResultArr, user_id, event.body.scrape_type)
   }
 
 
@@ -43,7 +30,6 @@ module.exports.scrapeAndSave = async event => {
   }
 
 }
-
 
 module.exports.oneTimeScrape = async event => {
   if (!event.body.item_name)
@@ -60,36 +46,39 @@ module.exports.oneTimeScrape = async event => {
   return result
 }
 
-module.exports.createUser = async event => {
-  if (!event.body.username)
-    return Response.createErrorResponse(404, 'Item not supplied')
+module.exports.createCronRequest = async event => {
+  if (!event.header['Authorization'])
+    return Response.createErrorResponse(404, 'Could not identify user')
 
-  if (!event.body.password)
-    return Response.createErrorResponse(404, 'Item not supplied')
-  let result = null
+  if (!event.body)
+    return Response.createErrorResponse(404, 'Insufficient information to create Cron Request')
+
+  if (!dbFunctions.checkFields(event.body, CronRequest))
+    return Response.createErrorResponse(404, 'Insufficient information to create Cron Request')
+
   try {
-    result = await db.createUser(event.body)
+    let result = await dbFunctions.createCronRequest(event.body, user_id)
+    return Response.createSuccessResponse(201, "Successfully created cron request", result)
   }
   catch (e) {
-    console.error(e)
-    return Response.createErrorResponse(500, "Unknown error occurred")
+    return Response.createErrorResponse(500, 'Error while creating cron request')
   }
-
-  return result ?
-    Response.createSuccessResponse(201, "Successfully created user", result) :
-    Response.createErrorResponse(500, 'Item not supplied')
-}
-
-module.exports.updateUser = async event => {
-
-}
-
-module.exports.createCronRequest = async event => {
-
 }
 
 module.exports.updateCronRequest = async event => {
+  if (!event.header['Authorization'])
+    return Response.createErrorResponse(404, 'Could not identify user')
 
+  if (!event.body)
+    return Response.createErrorResponse(404, 'Insufficient information to create Cron Request')
+
+  try {
+    let result = await dbFunctions.createCronRequest(event.body, user_id)
+    return Response.createSuccessResponse(201, "Successfully created cron request", result)
+  }
+  catch (e) {
+    return Response.createErrorResponse(500, 'Error while creating cron request')
+  }
 }
 
 

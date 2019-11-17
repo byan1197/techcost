@@ -1,36 +1,51 @@
-const bcrypt = require('bcrypt')
-const User = require('../models/User')
+const ScrapeResults = require('../models/ScrapeResult')
+const CronRequest = require('../models/CronRequest')
 const db = require('./db-executor')
 const mongoose = require('mongoose')
-const MONGO_URL = 'mongodb+srv://bond:PASSWORDHERE@cluster0-1ed4o.mongodb.net/test?retryWrites=true&w=majority'
+const MONGO_URL = process.env.MONGO_URL
 
-module.exports.saveScrapedData = (result, user_id) => {
-    // db.exec()
-}
+module.exports.saveScrapedData = (resultsArr, user_id, type) => {
 
-module.exports.createUser = async userData => {
-
-    let isUsernameAvailable = await db
-        .exec(MONGO_URL,
-            () => User.find({ username: userData.username })
-                .then(users => users.length === 0))
-
-    let userSaveResult = false;
-
-    if (isUsernameAvailable) {
-
-        let encryptedPassword = await bcrypt.hash(userData.password, 10)
-
-        let newUser = new User({
+    let bulkDocs = resultsArr.map(res => {
+        return new ScrapeResults({
             _id: new mongoose.Types.ObjectId(),
-            username: userData.username,
-            password: encryptedPassword
+            user: user_id,
+            type: type,
+            name: res.name,
+            link: res.link,
+            price: res.price
         })
+    })
 
-        return db
-            .exec(MONGO_URL,
-                () => newUser.save()
-                .then(user => user._id))
-    }
+    ScrapeResults.collection.insertMany(bulkDocs)
 
 }
+
+
+module.exports.createCronRequest = (body, user_id) => {
+    let cronRequest = new CronRequest(body)
+
+    return db.exec(MONGO_URL, () => cronRequest.save())
+        .then(d => d)
+        .catch(e => {
+            console.error(e)
+            throw new Error({
+                message: "Could not create cron request"
+            })
+        })
+}
+
+module.exports.updateCronRequest = (body, user_id) => {
+    let cronRequest = new CronRequest({ ...body, user: user_id});
+
+    return db.exec(MONGO_URL, () => cronRequest.save())
+        .then(d => d)
+        .catch(e => {
+            console.error(e)
+            throw new Error({
+                message: "Could not create cron request"
+            })
+        })
+}
+
+module.exports.checkFields = db.check;

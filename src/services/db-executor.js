@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Promise = require('bluebird')
+const User = require('../models/User')
 mongoose.Promise = Promise;
 
 function exec(dbUrl, fn) {
@@ -11,4 +12,13 @@ function exec(dbUrl, fn) {
         })
 }
 
-module.exports = { exec }
+function checkFields(fieldsArr, MongooseObj) {
+    let requiredFields = Object.keys(MongooseObj.schema.paths).filter(k => MongooseObj.schema.paths[k].isRequired)
+    requiredFields.forEach(f => {
+        if (!fieldsArr.includes(f))
+            return false
+    })
+    return true;
+}
+
+module.exports = { exec, check }
