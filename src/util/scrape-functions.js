@@ -1,25 +1,20 @@
 
-const BBScraper = require('../services/newegg-scraper')
 const CCScraper = require('../services/cancomp-scraper')
-const NEScraper = require('../services/bestbuy-scraper')
+const NEScraper = require('../services/newegg-scraper')
 
-module.exports = (type, item) => {
+module.exports = async (type, item, num_items) => {
 
-    let result = null;
+    let numResults = num_items || 1
 
     switch (type) {
-        case ('BESTBUY'):
-            result = BBScraper.scrape(item, 10)
-            break
-        case ('CANADACOMP'):
-            result = CCScraper.scrape(item, 10)
-            break
-        case ('NEWEGG'):
-            result = NEScraper.scrape(item, 10)
-            break
+        case ('OPC'):
+            return await []
+        case ('CC'):
+            return await CCScraper.scrape(item, numResults)
+        case ('NE'):
+            return await NEScraper.scrape(item, numResults)
         default:
-            result = false
+            return await false
     }
 
-    return result
 }

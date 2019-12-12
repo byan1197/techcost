@@ -1,0 +1,12 @@
+default: &default
+  <<: *default
+  MONGO_URL: "mongodb+srv://segdude:supersecret@cluster0-1ed4o.mongodb.net/test?retryWrites=true&w=majority"
+  TOKEN_SECRET: "techcostsecret"
+dev:
+  <<: *default
+
+staging:
+  <<: *default
+
+prod:
+  <<: *default

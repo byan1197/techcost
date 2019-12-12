@@ -23,7 +23,7 @@ module.exports.saveScrapedData = (resultsArr, user_id, type) => {
 
 
 module.exports.createCronRequest = (body, user_id) => {
-    let cronRequest = new CronRequest(body)
+    let cronRequest = new CronRequest({ ...body, user: user_id })
 
     return db.exec(MONGO_URL, () => cronRequest.save())
         .then(d => d)
@@ -36,7 +36,7 @@ module.exports.createCronRequest = (body, user_id) => {
 }
 
 module.exports.updateCronRequest = (body, user_id) => {
-    let cronRequest = new CronRequest({ ...body, user: user_id});
+    let cronRequest = new CronRequest({ ...body, user: user_id });
 
     return db.exec(MONGO_URL, () => cronRequest.save())
         .then(d => d)
@@ -46,6 +46,13 @@ module.exports.updateCronRequest = (body, user_id) => {
                 message: "Could not create cron request"
             })
         })
+}
+
+module.exports.getScrapeResultsByUser = async userid => {
+    return db.exec(MONGO_URL, () => ScrapeResults.find({ user: userid }).sort({createdAt: 'asc'})).catch(e => {
+        console.error(e)
+        return false;
+    })
 }
 
 module.exports.checkFields = db.check;

@@ -1,15 +1,19 @@
 const db = require('./src/services/db-user-functions')
 const Response = require('./src/util/response')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 module.exports.createUser = async event => {
-    if (!event.body.username)
+    let body = typeof (event.body) === 'string' ? JSON.parse(event.body) : event.body
+
+    if (!body.username)
         return Response.createErrorResponse(404, 'Item not supplied')
 
-    if (!event.body.password)
+    if (!body.password)
         return Response.createErrorResponse(404, 'Item not supplied')
     let result = null
     try {
-        result = await db.createUser(event.body)
+        result = await db.createUser(body)
     }
     catch (e) {
         console.error(e)
@@ -22,20 +26,42 @@ module.exports.createUser = async event => {
 }
 
 module.exports.login = async event => {
-    if (!event.body.username)
-        return Response.createErrorResponse(404, 'Item not supplied')
+    let user = null;
+    let body = typeof (event.body) === 'string' ? JSON.parse(event.body) : event.body
 
-    if (!event.body.password)
-        return Response.createErrorResponse(404, 'Item not supplied')
+    if (!body.username)
+        return Response.createErrorResponse(400, 'Username not supplied')
 
-    let result = null;
+    if (!body.password)
+        return Response.createErrorResponse(400, 'Password not supplied')
+
     try {
-        result = db.login(event.body)
+        user = await db.findUserByUsername(body.username)
+        if (!user)
+            return Response.createErrorResponse(401, 'Authentication Failed')
+        else {
+            let bycryptResult = await bcrypt.compare(body.password, user.password);
+
+            if (!bycryptResult)
+                return Response.createErrorResponse(401, 'Authentication Failed');
+
+            const token = jwt.sign(
+                {
+                    uid: user._id,
+                    username: user.username
+                },
+                process.env.TOKEN_SECRET,
+                {
+                    expiresIn: "1d"
+                }
+            );
+
+            console.log('User ' + user.username + ' logged in')
+            return Response.createSuccessResponse(201, "Successfully logged in", { token: token })
+        }
     }
     catch (e) {
         return Response.createErrorResponse(500, e.message)
     }
 
-    console.log('User ' + result.username + ' logged in')
-    return Response.createSuccessResponse(201, "Successfully logged in", { token: result.token })
 }

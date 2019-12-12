@@ -3,6 +3,16 @@ service: techcost-scraper
 provider:
   name: aws
   runtime: nodejs10.x
+  environment:
+    MONGO_URL: "${self:custom.tokens.MONGO_URL}"
+    TOKEN_SECRET: "${self:custom.tokens.TOKEN_SECRET}"
+
+package:
+  exclude:
+    - tokens.yml
+
+custom:
+  tokens: ${file(tokens.yml):default}
 
 functions:
   scrapeAndSave:
@@ -17,8 +27,8 @@ functions:
     handler: handler.oneTimeScrape
     events:
       - http:
-          path: scrape-result/
-          method: GET
+          path: scrape-result/one-time
+          method: POST
           cors: true
   updateCronRequest:
     handler: handler.updateCronRequest
@@ -39,11 +49,25 @@ functions:
           method: POST
           cors: true
   createUser: 
-    handler: handler.createUser
+    handler: user-handler.createUser
     events:
       - http:
           path: user
           method: POST
+          cors: true
+  login: 
+    handler: user-handler.login
+    events:
+      - http:
+          path: user/login
+          method: POST
+          cors: true
+  getScrapeResults: 
+    handler: handler.getScrapeResults
+    events:
+      - http:
+          path: scrape-result
+          method: GET
           cors: true
 
 

@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt')
 const User = require('../models/User')
 const db = require('./db-executor')
 const mongoose = require('mongoose')
-const MONGO_URL = 'mongodb+srv://bond:PASSWORDHERE@cluster0-1ed4o.mongodb.net/test?retryWrites=true&w=majority'
+const MONGO_URL = process.env.MONGO_URL
 
 
 module.exports.createUser = async userData => {
@@ -30,31 +30,14 @@ module.exports.createUser = async userData => {
 
 }
 
-module.exports.login = async loginInfo => {
+module.exports.findUserByUsername = async username => {
+    let user = await db.exec(MONGO_URL, () => User.find({ username: username }))
+        .catch(e => {
+            console.error(e)
+            return []
+        })
 
-    let user = await db.exec(dbUrl, () => User.find({ username: loginInfo.username }));
-    if (user.length !== 1)
-        return status.createErrorResponse(401, 'Authentication Failed')
-    else {
-        try {
-            let bycryptResult = await bcrypt.compare(loginInfo.password, user[0].password);
-            if (!bycryptResult)
-                return status.createErrorResponse(401, 'Authentication Failed');
-            const token = jwt.sign({
-                userId: user[0]._id
-            },
-                process.env.TOKEN_SECRET,
-                {
-                    expiresIn: "1d"
-                }
-            );
-            return { ...user, token: token }
-        } catch (err) {
-            console.error(err)
-            throw new Error({ message: "Could not login" })
-        }
-    }
-
+    return user[0] || false
 }
 
 module.exports.checkFields = db.check;

@@ -4,12 +4,12 @@ const bb_scraper = require('./services/bestbuy-scraper')
 
 
 
-const testSearch = "27 inch monitor"
+const testSearch = 'benq GW2780'
 
-// ne_scraper.scrape(testSearch, 15).then(data => {
-//     console.log('NEWEGG RESULTS')
-//     console.log(data)
-// });
+ne_scraper.scrape(testSearch, 15).then(data => {
+    console.log('NEWEGG RESULTS')
+    console.log(data)
+});
 
 cc_scraper.scrape(testSearch, 15).then(data => {
     console.log('\nCANADA COMPUTER RESULTS')

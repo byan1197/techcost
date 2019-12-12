@@ -6,9 +6,7 @@ const CronRequest = mongoose.Schema({
     isDeleted: { type: mongoose.Schema.Types.Boolean, default: false },
     item: { type: mongoose.Schema.Types.String, required: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    willScrapeBestBuy: { type: mongoose.Schema.Types.Boolean, default: false },
-    willScrapeCanadaComputers: { type: mongoose.Schema.Types.Boolean, default: false },
-    willScrapeNewEgg: { type: mongoose.Schema.Types.Boolean, default: false },
+    type: { type: mongoose.Schema.Types.String, required: true }
 });
 
 module.exports = mongoose.model('CronRequest', CronRequest);

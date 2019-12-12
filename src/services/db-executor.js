@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Promise = require('bluebird')
-const User = require('../models/User')
 mongoose.Promise = Promise;
 
 function exec(dbUrl, fn) {
@@ -21,4 +20,4 @@ function checkFields(fieldsArr, MongooseObj) {
     return true;
 }
 
-module.exports = { exec, check }
+module.exports = { exec, checkFields }
