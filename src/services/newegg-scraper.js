@@ -10,6 +10,8 @@ NEScraper.scrape = (item, limit) => {
         console.log(url)
         let resultLimit = limit || 10;
         let results = [];
+        osmosis.config('concurrency', 2);
+        osmosis.config('user_agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36');
         osmosis
             .get(url)
             .find(':not(.search-suggestions)>.items-view .item-container .item-info')

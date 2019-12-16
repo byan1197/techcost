@@ -1,5 +1,5 @@
 const db = require('./src/services/db-user-functions')
-const Response = require('./src/util/response')
+const Response = require('@bonyaa/techcost-commons/common-util/response')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
