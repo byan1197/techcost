@@ -27,8 +27,13 @@ functions:
     handler: handler.oneTimeScrape
     events:
       - http:
-          path: scrape-result/one-time
+          path: scrape-result/one-time/{item_name}/{scrape_type}
           method: GET
+          request:
+            parameters:
+              paths:
+                scrape_type: true
+                item_name: true
           cors: true
   updateCronRequest:
     handler: handler.updateCronRequest

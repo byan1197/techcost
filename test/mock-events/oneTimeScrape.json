@@ -1,5 +1,5 @@
 {
-	"body": {
+	"pathParameters": {
 		"item_name": "mechanical keyboard brown switch",
 		"scrape_type": "NE"
 	}

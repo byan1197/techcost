@@ -44,16 +44,15 @@ module.exports.scrapeAndSave = async event => {
 }
 
 module.exports.oneTimeScrape = async event => {
-  let body = typeof (event.body) === 'string' ? JSON.parse(event.body) : event.body
+  let pathParam = typeof (event.pathParameters) === 'string' ? JSON.parse(event.pathParameters) : event.pathParameters
 
-  if (!body.item_name)
+  if (!pathParam.item_name)
     return Response.createErrorResponse(400, 'Item not supplied')
 
-  if (!body.scrape_type)
+  if (!pathParam.scrape_type)
     return Response.createErrorResponse(400, 'Site to scrape not specified')
 
-  let result = await scrapeFunctions(body.scrape_type, body.item_name, 15)
-  console.log('result', result)
+  let result = await scrapeFunctions(pathParam.scrape_type, pathParam.item_name, 15)
   return Response.createSuccessResponse(200, "Successfully scraped", result)
 }
 
