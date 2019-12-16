@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt')
-const User = require('../models/User')
-const db = require('./db-executor')
+const User = require('@bonyaa/techcost-commons/models/User')
+const db = require('@bonyaa/techcost-commons/services/db-executor')
 const mongoose = require('mongoose')
 const MONGO_URL = process.env.MONGO_URL
 

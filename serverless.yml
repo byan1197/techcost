@@ -28,7 +28,7 @@ functions:
     events:
       - http:
           path: scrape-result/one-time
-          method: POST
+          method: GET
           cors: true
   updateCronRequest:
     handler: handler.updateCronRequest

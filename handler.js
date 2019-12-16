@@ -1,7 +1,7 @@
 const scrapeFunctions = require('./src/util/scrape-functions')
 const dbFunctions = require('./src/services/db-functions')
-const Response = require('./src/util/response')
-const CronRequest = require('./src/models/CronRequest')
+const Response = require('@bonyaa/techcost-commons/common-util/response')
+const CronRequest = require('@bonyaa/techcost-commons/models/CronRequest')
 const jwt = require('jsonwebtoken')
 
 const SCRAPE_TYPES = {
@@ -23,11 +23,17 @@ module.exports.scrapeAndSave = async event => {
   let scrapeResultArr = await scrapeFunctions(event.body.scrape_type, event.body.item_name)
   let saveResult = null
 
+  console.log(scrapeResultArr)
+
+  if (scrapeResultArr.length === 0)
+    return Response.createErrorResponse(400, "Could not find items")
   if (!scrapeResultArr)
     return Response.createErrorResponse(500, "Could not gather data")
   else {
-    saveResult = dbFunctions.saveScrapedData(scrapeResultArr, user_id, event.body.scrape_type)
+    saveResult = await dbFunctions.saveScrapedData(scrapeResultArr, event.body.user_id, event.body.scrape_type)
   }
+
+  console.log('saveResult', saveResult)
 
   if (!saveResult)
     return Response.createErrorResponse(500, "Could not gather data")
@@ -48,7 +54,7 @@ module.exports.oneTimeScrape = async event => {
 
   let result = await scrapeFunctions(body.scrape_type, body.item_name, 15)
   console.log('result', result)
-  return Response.createSuccessResponse(201, "Successfully scraped", result)
+  return Response.createSuccessResponse(200, "Successfully scraped", result)
 }
 
 module.exports.createCronRequest = async event => {
