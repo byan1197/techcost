@@ -1,18 +1,22 @@
 const ne_scraper = require('./services/newegg-scraper')
 const cc_scraper = require('./services/cancomp-scraper')
+const bb_scraper = require('./services/bestbuy-scraper')
 
 
 
-const testSearch = "nzxt h500 white"
-
-
+const testSearch = 'benq GW2780'
 
 ne_scraper.scrape(testSearch, 15).then(data => {
+    console.log('NEWEGG RESULTS')
     console.log(data)
-    console.log(data.length)
 });
 
 cc_scraper.scrape(testSearch, 15).then(data => {
+    console.log('\nCANADA COMPUTER RESULTS')
     console.log(data)
-    console.log(data.length)
 });
+
+// bb_scraper.scrape(testSearch, 15).then(data => {
+//     console.log('\nBEST BUY RESULTS')
+//     console.log(data)
+// })
