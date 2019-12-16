@@ -4,7 +4,7 @@ const NEScraper = require('../services/newegg-scraper')
 
 module.exports = async (type, item, num_items) => {
 
-    let numResults = num_items || 1
+    let numResults = num_items || 3
 
     switch (type) {
         case ('OPC'):
