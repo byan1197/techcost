@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@bonyaa/techcost-commons": "^1.0.0",
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.0",
     "dotenv": "^8.2.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
